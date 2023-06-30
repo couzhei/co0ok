@@ -3,6 +3,17 @@ from django.utils import timezone
 from django.contrib.auth.models import User  # very sophisticated user abstraction
 
 
+class PublishedManager(
+    models.Manager
+):  # my first model manager please use mngr snippet
+    def get_queryset(self):
+        return (
+            super(PublishedManager, self)
+            .get_queryset()
+            .filter(status=Post.Status.PUBLISHED)
+        )
+
+
 # Create your models here.
 class Post(models.Model):
     """Model definition for Post."""
@@ -16,7 +27,7 @@ class Post(models.Model):
         """
 
         DRAFT = "DF", "Draft"
-        published_onED = "PB", "published_oned"
+        PUBLISHED = "PB", "Published"
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="blog_posts"
@@ -33,6 +44,10 @@ class Post(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     published_on = models.DateTimeField(default=timezone.now)
     updated_on = models.DateTimeField(auto_now=True)
+
+    # model managers for post
+    objects = models.Manager()  # The default manager
+    published = PublishedManager()  # Our custom manager
 
     class Meta:
         """Meta definition for Post."""
