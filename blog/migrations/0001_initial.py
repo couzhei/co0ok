@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 (
                     "status",
                     models.CharField(
-                        choices=[("DF", "Draft"), ("PB", "published_oned")],
+                        choices=[("DF", "Draft"), ("PB", "published")],
                         default="DF",
                         max_length=2,
                     ),
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 "indexes": [
                     models.Index(
                         fields=["-published_on"],
-                        name="blog_post_published_on_80a593_idx",
+                        name="blog_post_publish_80a593_idx",
                     )
                 ],
             },

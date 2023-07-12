@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-
 # from django.conf.urls import include  # older version?
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # local
+    # local paths
+    # with the following include from now on user will be directed
+    # to blog's urlpatterns (behind the scene)
     path("blog/", include("blog.urls", namespace="blog")),
 ]

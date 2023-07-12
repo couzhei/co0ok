@@ -1,11 +1,18 @@
+# This includes the data models of your applications. All Django apps
+# need to have a models.py file but it can be left empty.
+
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User  # very sophisticated user abstraction
+# very sophisticated user abstraction
+from django.contrib.auth.models import User
+# introduced for using canonical URLs
+from django.urls import reverse
+# from django.core.urlresolvers import reverse
+# this is what I get for get_ab autocompletion
 
 
-class PublishedManager(
-    models.Manager
-):  # my first model manager please use mngr snippet
+class PublishedManager(models.Manager):
+    # my first model manager please use mngr snippet
     def get_queryset(self):
         return (
             super(PublishedManager, self)
@@ -20,10 +27,10 @@ class Post(models.Model):
 
     class Status(models.TextChoices):
         """an enumeration class for the post status
-        with available choices DRAFT and published_onED
+        with available choices DRAFT and PUBLISHED
         with their respective values DF and PB
         and their labels for readable name are
-        Draft and published_oned
+        Draft and published.
         """
 
         DRAFT = "DF", "Draft"
@@ -31,14 +38,15 @@ class Post(models.Model):
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="blog_posts"
-    )  # models.CASCADE ?!?!!??! What does it?!
+    )  # models.CASCADE ?!?!!??! What does it do?!
 
     status = models.CharField(
         max_length=2, choices=Status.choices, default=Status.DRAFT
     )
 
     title = models.CharField(max_length=250, null=False, blank=False)
-    slug = models.SlugField(max_length=250)
+    slug = models.SlugField(max_length=250,
+                            unique_for_date="published_on")
     body = models.TextField()
 
     created_on = models.DateTimeField(auto_now_add=True)
@@ -55,6 +63,8 @@ class Post(models.Model):
         # verbose_name = "Post"
         # verbose_name_plural = "Posts"
         ordering = ["-published_on"]
+        # Blog posts are usually displayed in reverse chronological order
+        # (from newest to oldest)
         indexes = [
             models.Index(fields=["-published_on"]),
         ]
@@ -62,3 +72,15 @@ class Post(models.Model):
     def __str__(self):
         """Unicode representation of Post."""
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('blog:post_detail',
+                       args=[  # self.id,
+                           self.published_on.year,
+                           self.published_on.month,
+                           self.published_on.day,
+                           self.slug])
+
+    # def get_absolute_url(self):
+    #     from django.core.urlresolvers import reverse
+    #     return reverse('blog:post_detail', kwargs={'pk': self.pk})

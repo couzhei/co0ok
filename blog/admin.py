@@ -1,3 +1,6 @@
+# This is where you register models to include them in the Django
+# administration site (using this site is optional)
+
 from django.contrib import admin
 from .models import Post
 
@@ -13,7 +16,8 @@ class PostAdmin(admin.ModelAdmin):
     induces some functionalities
     """
 
-    list_display = ["title", "slug", "author", "published_on", "status"]
+    list_display = ["title", "slug", "author", "published_on",
+                    "updated_on", "status"]
     list_filter = ["status", "created_on", "published_on", "author"]
     search_fields = ["title", "body"]
     prepopulated_fields = {"slug": ("title",)}

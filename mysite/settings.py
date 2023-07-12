@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-#$nsjt&7v+aan-&#&gc(bb$ibeww3$3(3!^@ltvdb5#e#)vbf#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
+ALLOWED_HOSTS = [  # is not applied when DEBUG = True
     "0.0.0.0",
     "localhost",
     "127.0.0.1",  # just for fun
@@ -36,12 +36,12 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "django.contrib.admin",  # adminstration site app
+    "django.contrib.auth",  # An authentication framework
+    "django.contrib.contenttypes",  # A framework for handling content types
+    "django.contrib.sessions",  # A session framework
+    "django.contrib.messages",  # A messaging framework
+    "django.contrib.staticfiles",  # A framework for managing static files
     # My locally created apps:
     "blog",  # or blog.apps.BlogConfig
 ]
@@ -56,6 +56,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# The following indicates the Python module where the root URL patterns of
+# your application are defined.
 ROOT_URLCONF = "mysite.urls"
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
@@ -82,7 +84,8 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
+DATABASES = {  # a dictionary that contains the settings for all the databases to be used in the project.
+    # There must always be a default database. The default configuration uses an SQLite3 database
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
@@ -119,7 +122,8 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
+# This tells Django to activate/deactivate timezone support.
+# Django comes with a support for timezone-aware datetimes
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

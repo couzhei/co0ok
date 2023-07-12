@@ -2,14 +2,23 @@ from django.urls import path
 from . import views
 
 app_name = "blog"  # application namespace
-
+# namespaces have to be unique across your entire project
 
 # URL patterns allow you to map URLs to views
 urlpatterns = [
     # post views
     path("", views.post_list, name="post_list"),
+    # in the following we use angle brackets to capture some parameters
+    # since any value captured is by default string, we can convert them
+    # with path converters the way shown below <int:year>
     path("<int:id>/", views.post_detail, name="post_detail"),
 ]
+
+# modifying urlpatterns to use publication date and slug for the post
+# # detail URL.
+urlpatterns[1] = path('<int:year>/<int:month>/<int:day>/<slug:post>/',
+                      views.post_detail,
+                      name='post_detail')
 
 # all urlpattern are in form of a path
 # with three arguments:
