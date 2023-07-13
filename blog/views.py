@@ -9,7 +9,13 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
 # Create your views here.
-from .models import Post
+from .models import Post, Comment
+
+# Making use of our forms
+from .forms import EmailPostForm
+
+# This one for sending emails
+from django.core.mail import send_mail  # , send_mass_mail
 
 # pagination is on the way
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -53,6 +59,45 @@ class PostListView(ListView):
     context_object_name = "posts"
     paginate_by = 5
     template_name = "blog/post/list.html"
+
+
+# a function-based view for handling forms
+def post_share(request, post_id):
+    """
+    Takes the request obj and the post_id variable as params
+    to handle both HTTP methods GET and POST where
+    in case of the latter it'll send an email
+    """
+
+    # Retrieve post by its id
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    sent = False
+
+    if request.method == "POST":  # POST method
+        # Form was submitted
+        form = EmailPostForm(request.POST)
+        if form.is_valid():
+            # Form fields passed validation
+            cd = form.cleaned_data  # a dict of form fields and their values
+            # In case of failing is_valid(), cleaned_data attribute still got
+            # valid fields
+            # ... send email
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+            subject = f"{cd['name']} recommends you read " f"{post.title}"
+            message = (
+                f"Read {post.title} at {post_url}\n\n"
+                + f"{cd['name']}'s comments: {cd['comments']}"
+            )
+            send_mail(subject, message, "couzhei@gmail.com", [cd["to"]])
+            sent = True
+
+    # elif request.method == "GET":
+    else:
+        form = EmailPostForm()  # GET method
+
+    return render(
+        request, "blog/post/share.html", {"post": post, "form": form, "sent": sent}
+    )
 
 
 def post_detail(

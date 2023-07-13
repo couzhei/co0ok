@@ -3,10 +3,13 @@
 
 from django.db import models
 from django.utils import timezone
+
 # very sophisticated user abstraction
 from django.contrib.auth.models import User
+
 # introduced for using canonical URLs
 from django.urls import reverse
+
 # from django.core.urlresolvers import reverse
 # this is what I get for get_ab autocompletion
 
@@ -45,8 +48,7 @@ class Post(models.Model):
     )
 
     title = models.CharField(max_length=250, null=False, blank=False)
-    slug = models.SlugField(max_length=250,
-                            unique_for_date="published_on")
+    slug = models.SlugField(max_length=250, unique_for_date="published_on")
     body = models.TextField()
 
     created_on = models.DateTimeField(auto_now_add=True)
@@ -74,13 +76,49 @@ class Post(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('blog:post_detail',
-                       args=[  # self.id,
-                           self.published_on.year,
-                           self.published_on.month,
-                           self.published_on.day,
-                           self.slug])
+        return reverse(
+            "blog:post_detail",
+            args=[  # self.id,
+                self.published_on.year,
+                self.published_on.month,
+                self.published_on.day,
+                self.slug,
+            ],
+        )
 
     # def get_absolute_url(self):
     #     from django.core.urlresolvers import reverse
     #     return reverse('blog:post_detail', kwargs={'pk': self.pk})
+
+
+class Comment(models.Model):
+    """A Model to handle comments given to a post, which
+    is a many to one relationship."""
+
+    post = models.ForeignKey(  # type: ignore
+        Post,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    # this related_name is funny! it allows us to name the
+    # attribute that you use for the relationship from
+    # related object back to this one
+
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        """Meta definition for Comment."""
+
+        ordering = ["created_on"]
+        indexes = [
+            models.Index(fields=["created_on"]),
+        ]
+
+    def __str__(self):
+        """Unicode representation of Comment."""
+        return f"Comment by {self.name} on {self.post}"

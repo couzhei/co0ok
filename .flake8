@@ -1,0 +1,14 @@
+[flake8]
+exclude = 
+    .git,
+    __pycache__,
+    migrations,
+    */settings.py,
+    */migrations,
+    .vscode,
+max-line-length = 88 ; this is a pro tip using flake8 with black
+extend-ignore = E203
+
+
+[tool.black]
+line-length = 88

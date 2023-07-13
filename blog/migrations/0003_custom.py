@@ -8,7 +8,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("blog", "0002_rename_blog_post_published_on_80a593_idx_blog_post_publish_80a593_idx_and_more"),
+        (
+            "blog",
+            "0002_rename_blog_post_published_on_80a593_idx_blog_post_publish_80a593_idx_and_more",
+        ),
     ]
 
     operations = [

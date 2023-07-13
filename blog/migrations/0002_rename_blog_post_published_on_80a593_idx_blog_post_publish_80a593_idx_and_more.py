@@ -17,8 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="post",
             name="slug",
-            field=models.SlugField(
-                max_length=250, unique_for_date="published_on"),
+            field=models.SlugField(max_length=250, unique_for_date="published_on"),
         ),
         migrations.AlterField(
             model_name="post",

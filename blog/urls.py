@@ -14,6 +14,7 @@ urlpatterns = [
     # since any value captured is by default string, we can convert them
     # with path converters the way shown below <int:year>
     path("<int:id>/", views.post_detail, name="post_detail"),
+    path("<int:post_id>/share/", views.post_share, name="post_share"),
 ]
 
 # modifying urlpatterns to use publication date and slug for the post

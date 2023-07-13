@@ -1,0 +1,21 @@
+{% extends 'blog/base.html' %}
+{% block title %}
+    Share a post with your friends!
+{% endblock title %}
+<!-- This is a template showing both the form to share a post via email and,
+to display a success message when the email has been sent.-->
+{% block content %}
+    {% if sent %}
+        <!-- we differentiate between both cases using this condition -->
+        <h1>E-mail succussfully sent.</h1>
+        <p>"{{ post.title }}" was succussfully sent to {{ form.cleaned_data.to }}.</p>
+        <a href="{{ post.get_absolute_url }}">Back to the post</a>
+    {% else %}
+        <h1>Share "{{ post.title }}" by e-mail</h1>
+        <form method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="submit" value="Send e-mail">
+        </form>
+    {% endif %}
+{% endblock content %}

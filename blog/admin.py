@@ -16,8 +16,7 @@ class PostAdmin(admin.ModelAdmin):
     induces some functionalities
     """
 
-    list_display = ["title", "slug", "author", "published_on",
-                    "updated_on", "status"]
+    list_display = ["title", "slug", "author", "published_on", "updated_on", "status"]
     list_filter = ["status", "created_on", "published_on", "author"]
     search_fields = ["title", "body"]
     prepopulated_fields = {"slug": ("title",)}

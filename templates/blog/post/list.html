@@ -19,5 +19,5 @@
     to the template. By default ListView generic view
     passes the page requested in a variable called page_obj -->
     {% comment %} {% include 'pagination.html' with page=posts %} {% endcomment %}
-    {% include 'pagination.html' with page=page_obj %}
+    {% include "pagination.html" with page=page_obj %}
 {% endblock content %}
