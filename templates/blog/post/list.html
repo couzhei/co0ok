@@ -1,9 +1,7 @@
 {% extends "blog/base.html" %}
-
 {% block title %}
     My Blog
 {% endblock title %}
-
 {% block content %}
     <h1>My Blog</h1>
     {% for post in posts %}
@@ -11,11 +9,15 @@
         <!--and com for these -->
         <h2>
             {% comment %} <!-- <a href="{% url 'blog:post_detail' post.id %}"> replaced by--> {% endcomment %}
-            <a href="{{ post.get_absolute_url }}">
-                {{ post.title }}
-            </a>
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
         </h2>
         <p class="date">Published {{ post.publish }} by {{ post.author }}</p>
         {{ post.body|truncatewords:30|linebreaks }}
     {% endfor %}
+    <!-- In order to keep pagination working
+    we have to use the right page object that is passed
+    to the template. By default ListView generic view
+    passes the page requested in a variable called page_obj -->
+    {% comment %} {% include 'pagination.html' with page=posts %} {% endcomment %}
+    {% include 'pagination.html' with page=page_obj %}
 {% endblock content %}

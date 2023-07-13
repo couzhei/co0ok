@@ -7,7 +7,9 @@ app_name = "blog"  # application namespace
 # URL patterns allow you to map URLs to views
 urlpatterns = [
     # post views
-    path("", views.post_list, name="post_list"),
+    # path("", views.post_list, name="post_list"),
+    # modifying urlpatterns to access class-based view instead of function-based
+    path("", views.PostListView.as_view(), name="post_list"),
     # in the following we use angle brackets to capture some parameters
     # since any value captured is by default string, we can convert them
     # with path converters the way shown below <int:year>
@@ -16,9 +18,12 @@ urlpatterns = [
 
 # modifying urlpatterns to use publication date and slug for the post
 # # detail URL.
-urlpatterns[1] = path('<int:year>/<int:month>/<int:day>/<slug:post>/',
-                      views.post_detail,
-                      name='post_detail')
+urlpatterns[1] = path(
+    "<int:year>/<int:month>/<int:day>/<slug:post>/",
+    views.post_detail,
+    name="post_detail",
+)
+
 
 # all urlpattern are in form of a path
 # with three arguments:
