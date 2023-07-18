@@ -2,10 +2,12 @@
 # administration site (using this site is optional)
 
 from django.contrib import admin
-from .models import Post
+from .models import Post, Comment
 
 # Register your models here.
 # admin.site.register(Post) # or using the below decorator
+
+# TODO: Complete CommentAdmin
 
 
 # Customize the display of your models in adminstration site
@@ -23,3 +25,21 @@ class PostAdmin(admin.ModelAdmin):
     raw_id_fields = ["author"]
     date_hierarchy = "published_on"
     ordering = ["status", "published_on"]
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    """Admin View for Comment"""
+
+    list_display = ("name", "email", "post", "created_on", "active")
+    list_filter = ("active", "created_on", "updated_on")
+    search_fields = ("name", "email", "body")
+
+    # inlines = [
+    #     Inline,
+    # ]
+    # raw_id_fields = ("",)
+    # readonly_fields = ("",)
+
+    # date_hierarchy = ""
+    # ordering = ("",)

@@ -12,7 +12,7 @@ from django.views.generic import ListView
 from .models import Post, Comment
 
 # Making use of our forms
-from .forms import EmailPostForm
+from .forms import EmailPostForm, CommentForm
 
 # This one for sending emails
 from django.core.mail import send_mail  # , send_mass_mail
@@ -20,34 +20,53 @@ from django.core.mail import send_mail  # , send_mass_mail
 # pagination is on the way
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+# this is for comments' forms, we expect them to be submitted
+# using HTTP POST method
+from django.views.decorators.http import require_POST
 
-# def post_list(request):  # my first view
-#     # posts = Post.objects.filter(status=Post.Status.PUBLISHED)
-#     # I use model manager created for published posts
-#     post_list = Post.published.all()
+# to utilize our tag system
+from taggit.models import Tag
 
-#     # Pagination with 3 posts per page
-#     paginator = Paginator(post_list, 5)
-#     page_number = request.GET.get("page", 1)
-#     # posts = paginator.page(page_number) to handle errors
 
-#     try:
-#         posts = paginator.page(page_number)
-#     except EmptyPage:  # this way we can easily handle numbers that exceeds our pages
-#         posts = paginator.page(paginator.num_pages)
-#     # in case of not an integer number for pagination?
-#     except PageNotAnInteger:
-#         posts = paginator.page(1)
-#     return render(
-#         request,
-#         "blog/post/list.html",
-#         {
-#             "posts": posts,
-#         },
-#     )
-#     # we could also create a customised model manager
-#     # the default django's model manager is objects
+def post_list(request, tag_slug=None):  # my first view
+    # posts = Post.objects.filter(status=Post.Status.PUBLISHED)
+    # I use model manager created for published posts
+    post_list = Post.published.all()
+    tag = None
+
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        post_list = post_list.filter(tags__in=[tag])
+
+    # Pagination with 3 posts per page
+    paginator = Paginator(post_list, 5)
+    page_number = request.GET.get("page", 1)
+    # posts = paginator.page(page_number) to handle errors
+
+    try:
+        posts = paginator.page(page_number)
+    except EmptyPage:  # this way we can easily handle numbers that exceeds our pages
+        if int(page_number) > paginator.num_pages:
+            posts = paginator.page(paginator.num_pages)
+        else:
+            posts = paginator.page(1)
+    # in case of not an integer number for pagination?
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    return render(
+        request,
+        "blog/post/list.html",
+        {
+            "posts": posts,
+            "tag": tag,
+        },
+    )
+    # we could also create a customised model manager
+    # the default django's model manager is objects
+
+
 # farewell to function-based views for now
+# oopsie doopsie, back to it after playing around with tags
 
 
 class PostListView(ListView):
@@ -59,6 +78,42 @@ class PostListView(ListView):
     context_object_name = "posts"
     paginate_by = 5
     template_name = "blog/post/list.html"
+
+    def get_queryset(self):
+        """
+        In Django, when a class-based view is used, several methods are
+        automatically called during the request/response cycle. One of
+        these methods is get_queryset(), which is called internally by
+        Django when you use a class-based view that inherits from ListView.
+
+        When you provide a URL with a tag, such as /tag/tag-slug/, Django's
+        URL routing mechanism will match the URL pattern defined in your urls.py
+        file, which maps to the PostListView class-based view. The PostListView
+        is then instantiated, and its get_queryset() method is called.
+
+        In this case, the tag_slug is extracted from the URL using
+        self.kwargs.get("tag_slug"). If a tag slug is present in the URL, the
+        method retrieves the corresponding Tag object from the database and
+        filters the queryset to include only posts associated with that tag.
+        If no tag slug is present, all published posts are returned.
+
+        By overriding the get_queryset() method, you can dynamically modify
+        the queryset based on the requested URL parameters or any other custom
+        logic you want to implement.
+        """
+        # Retrieve the tag slug from the URL parameter
+        tag_slug = self.kwargs.get("tag_slug")
+
+        if tag_slug:
+            # Get the tag object based on the slug
+            tag = get_object_or_404(Tag, slug=tag_slug)
+            # Filter the posts based on the specified tag
+            queryset = Post.published.filter(tags__in=[tag])
+        else:
+            # If no tag is specified, retrieve all published posts
+            queryset = Post.published.all()
+
+        return queryset
 
 
 # a function-based view for handling forms
@@ -123,8 +178,44 @@ def post_detail(
         status=Post.Status.PUBLISHED,
     )
 
+    # List of active comments for this post
+    comments = post.comments.filter(active=True)  # type: ignore
+    # Form for users to comment
+    form = CommentForm()
+
     return render(
         request,
         "blog/post/detail.html",
-        {"post": post},
+        {"post": post, "comments": comments, "form": form},
+    )
+
+
+@require_POST
+def post_comment(request, post_id):
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+        status=Post.Status.PUBLISHED,
+    )
+
+    comment = None
+    # A comment was posted
+    form = CommentForm(data=request.POST)
+
+    if form.is_valid():
+        # Create a Comment object without saving it to the database
+        comment = form.save(commit=False)
+        # Assign the post to the comment
+        comment.post = post
+        # Save the comment to the database
+        comment.save()
+
+    return render(
+        request,
+        "blog/post/comment.html",
+        {
+            "post": post,
+            "form": form,
+            "comment": comment,
+        },
     )

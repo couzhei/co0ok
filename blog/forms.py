@@ -1,4 +1,5 @@
 from django import forms
+from .models import Comment
 
 
 class EmailPostForm(forms.Form):
@@ -28,3 +29,17 @@ class EmailPostForm(forms.Form):
         disabled=False,
         widget=forms.Textarea(attrs={"placeholder": "What's on your mind?"}),
     )
+
+
+class CommentForm(forms.ModelForm):
+    """Form definition for Comment."""
+
+    class Meta:
+        """Meta definition for Commentform."""
+
+        model = Comment
+        fields = (
+            "name",
+            "email",
+            "body",
+        )

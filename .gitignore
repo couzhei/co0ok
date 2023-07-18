@@ -237,3 +237,61 @@ yarn-error.log*
 /.stash
 
 README-*.md
+
+### Databases
+
+# MySQL
+*.sql
+*.sql.gz
+*.sql.bz2
+*.sql.xz
+*.sql.7z
+*.sql.rar
+*.sql.zip
+
+# PostgreSQL
+*.pg_dump
+*.pg_dump.gz
+*.pg_dump.bz2
+*.pg_dump.xz
+*.pg_dump.7z
+*.pg_dump.rar
+*.pg_dump.zip
+
+# MongoDB
+*.bson
+*.json
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Oracle
+*.dmp
+*.exp
+
+# Redis
+dump.rdb
+redis.conf
+/redis/
+
+### Message-brokers, task-queuer, distributed data storages
+
+# Kafka
+config/
+logs/
+data/
+
+# Celery
+*.pyc
+celerybeat-schedule
+
+# RabbitMQ
+*.log
+*.pid
+*.lock
+
+# Cassandra
+data/
+commitlog/
+saved_caches/

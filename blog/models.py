@@ -13,6 +13,9 @@ from django.urls import reverse
 # from django.core.urlresolvers import reverse
 # this is what I get for get_ab autocompletion
 
+# for tagging our blogs (pip install django-taggit)
+from taggit.managers import TaggableManager
+
 
 class PublishedManager(models.Manager):
     # my first model manager please use mngr snippet
@@ -38,6 +41,8 @@ class Post(models.Model):
 
         DRAFT = "DF", "Draft"
         PUBLISHED = "PB", "Published"
+
+    tags = TaggableManager()
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="blog_posts"

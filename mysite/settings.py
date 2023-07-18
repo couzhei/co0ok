@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",  # A framework for managing static files
     # My locally created apps:
     "blog",  # or blog.apps.BlogConfig
+    "taggit",  # django-taggit
 ]
 
 MIDDLEWARE = [
@@ -86,9 +87,15 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 
 DATABASES = {  # a dictionary that contains the settings for all the databases to be used in the project.
     # There must always be a default database. The default configuration uses an SQLite3 database
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "blog",
+        "USER": "blog",
+        "PASSWORD": "4858",
     }
 }
 

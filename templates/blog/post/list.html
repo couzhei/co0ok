@@ -1,9 +1,17 @@
 {% extends "blog/base.html" %}
 {% block title %}
-    My Blog
+    List of Published Articles
 {% endblock title %}
 {% block content %}
-    <h1>My Blog</h1>
+    <h1>
+        List of Published Articles
+    </h1>
+    <!-- In case of calling all the posts related to a single tag -->
+    {% if tag %}
+        <h2>
+            Posts tagged with "{{ tag.name }}"
+        </h2>
+    {% endif %}
     {% for post in posts %}
         {% comment %}use comm snippet for these comments{% endcomment %}
         <!--and com for these -->
@@ -11,13 +19,29 @@
             {% comment %} <!-- <a href="{% url 'blog:post_detail' post.id %}"> replaced by--> {% endcomment %}
             <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
         </h2>
-        <p class="date">Published {{ post.publish }} by {{ post.author }}</p>
+        {% if not tag %}
+            <p class="tags">
+                Tags: <!--{{ post.tags.all|join:", " }} This is fine,
+but it doesn't allow users to click on a tag to view all posts 
+related to that tag. We add that functionality with a link-->
+                {% for tag in post.tags.all %}
+                    <a href="{% url 'blog:post_list_by_tag' tag.slug %}">{{ tag.name }}</a>
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
+        <!--whoa the above join looks mysterious -->
+        <p class="date">
+            Published {{ post.publish }} by {{ post.author }}
+        </p>
         {{ post.body|truncatewords:30|linebreaks }}
     {% endfor %}
     <!-- In order to keep pagination working
     we have to use the right page object that is passed
     to the template. By default ListView generic view
     passes the page requested in a variable called page_obj -->
-    {% comment %} {% include 'pagination.html' with page=posts %} {% endcomment %}
-    {% include "pagination.html" with page=page_obj %}
+    {% include "pagination.html" with page=posts %}
+    {% comment %} {% include "pagination.html" with page=page_obj %} {% endcomment %}
 {% endblock content %}
