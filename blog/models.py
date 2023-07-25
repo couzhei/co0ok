@@ -54,6 +54,8 @@ class Post(models.Model):
 
     title = models.CharField(max_length=250, null=False, blank=False)
     slug = models.SlugField(max_length=250, unique_for_date="published_on")
+    # unique_for_date added since I decided to use slug for creating
+    # canonical urls, so what's their point not being uniquely defined?
     body = models.TextField()
 
     created_on = models.DateTimeField(auto_now_add=True)
@@ -81,6 +83,20 @@ class Post(models.Model):
         return self.title
 
     def get_absolute_url(self):
+        """
+        The reverse() function will build the URL dynamically using the
+        URL name defined in the URL patterns. If check out blog/urls.py
+
+        path("<int:id>/", views.post_detail, name="post_detail")
+
+        We have used the blog namespace followed by a colon and the URL
+        name post_detail. Remember that the blog namespace is defined in
+        the main urls.py file of the project when including the URL
+        patterns from blog.urls. The post_detail URL is defined above.
+        The resulting string, blog:post_detail, can be used globally in
+        your project to refer to the post detail URL. This URL has a
+        required parameter that is id in this case.
+        """
         return reverse(
             "blog:post_detail",
             args=[  # self.id,
@@ -92,6 +108,7 @@ class Post(models.Model):
         )
 
     # def get_absolute_url(self):
+    # # The canonical URL for a blog post detail view currently looks like /blog/1/
     #     from django.core.urlresolvers import reverse
     #     return reverse('blog:post_detail', kwargs={'pk': self.pk})
 
@@ -127,3 +144,4 @@ class Comment(models.Model):
     def __str__(self):
         """Unicode representation of Comment."""
         return f"Comment by {self.name} on {self.post}"
+

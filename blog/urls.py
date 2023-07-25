@@ -26,7 +26,8 @@ urlpatterns = [
 ]
 
 # modifying urlpatterns to use publication date and slug for the post
-# # detail URL.
+# detail URL. This modification happens after understanding the concept
+# of SEO-friendly canonical urls!
 urlpatterns[1] = path(
     "<int:year>/<int:month>/<int:day>/<slug:post>/",
     views.post_detail,

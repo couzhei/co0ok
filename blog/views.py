@@ -6,7 +6,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 # Now let's use some class-based views
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 # Create your views here.
 from .models import Post, Comment
@@ -41,17 +41,24 @@ def post_list(request, tag_slug=None):  # my first view
     # Pagination with 3 posts per page
     paginator = Paginator(post_list, 5)
     page_number = request.GET.get("page", 1)
-    # posts = paginator.page(page_number) to handle errors
+    # We retrieve the page GET HTTP parameter and store it in the page_number variable. This param-
+    # eter contains the requested page number. If the page parameter is not in the GET parameters
+    # of the request, we use the default value 1 to load the first page of results.
 
+    # posts = paginator.page(page_number) # This commented for handling errors below
+
+    # The following codes describe a way of handling errors
+    # regarding our pagination
     try:
         posts = paginator.page(page_number)
     except EmptyPage:  # this way we can easily handle numbers that exceeds our pages
+        # http://127.0.0.1:8000/blog/?page=-13
         if int(page_number) > paginator.num_pages:
             posts = paginator.page(paginator.num_pages)
         else:
             posts = paginator.page(1)
     # in case of not an integer number for pagination?
-    except PageNotAnInteger:
+    except PageNotAnInteger:  # like http://127.0.0.1:8000/blog/?page=asdf
         posts = paginator.page(1)
     return render(
         request,
@@ -75,9 +82,19 @@ class PostListView(ListView):
     """
 
     queryset = Post.published.all()
+    # Instead of defining a queryset attribute, we could have specified
+    # model = Post and Django would have built the generic Post.objects.all()
+    # QuerySet for us.
     context_object_name = "posts"
     paginate_by = 5
+    # the above properties came from MultipleObjectMixin which is one the parents
+    # of BaseListView (the other being View), which in turn, is one of the parents
+    # of ListView (the other being MultipleObjectTemplateResponseMixin see below)
     template_name = "blog/post/list.html"
+    # The daredavil who defined the above properties and might as well use it
+    # is called TemplateResponseMixin which is the parent class of
+    # MultipleObjectTemplateResponseMixin which in turn is one of the parents
+    # of the class ListView (the other parent being BaseListView)
 
     def get_queryset(self):
         """
@@ -138,7 +155,7 @@ def post_share(request, post_id):
             # valid fields
             # ... send email
             post_url = request.build_absolute_uri(post.get_absolute_url())
-            subject = f"{cd['name']} recommends you read " f"{post.title}"
+            subject = f"{cd['name']} recommends you to read " f"{post.title}"
             message = (
                 f"Read {post.title} at {post_url}\n\n"
                 + f"{cd['name']}'s comments: {cd['comments']}"
@@ -186,8 +203,17 @@ def post_detail(
     return render(
         request,
         "blog/post/detail.html",
-        {"post": post, "comments": comments, "form": form},
+        {
+            "post": post,
+            "comments": comments,
+            "form": form,
+        },
     )
+
+
+# CV view for post_detail
+class PostDetailView(DetailView):
+    pass
 
 
 @require_POST

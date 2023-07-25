@@ -8,18 +8,31 @@ class EmailPostForm(forms.Form):
         label="Your Name:",
         required=True,
         widget=forms.TextInput(
-            attrs={"placeholder": "e.g. John Wick or Johnny"},
+            attrs={
+                "placeholder": "e.g. John Wick or Johnny",
+                "size": "26",
+            },
         ),
     )
     email = forms.EmailField(
         label="Your Email:",
         required=True,
-        widget=forms.TextInput(attrs={"placeholder": "johnwick@example.org"}),
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "johnwick@example.org",
+                "size": "26",
+            }
+        ),
     )
     to = forms.EmailField(
         label="Recipient:",
         required=True,
-        widget=forms.TextInput(attrs={"placeholder": "oldmarrytodd@example.org"}),
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "oldmarrytodd@example.org",
+                "size": "26",
+            }
+        ),
     )
     comments = forms.CharField(
         required=False,
@@ -35,7 +48,7 @@ class CommentForm(forms.ModelForm):
     """Form definition for Comment."""
 
     class Meta:
-        """Meta definition for Commentform."""
+        """Meta definition for a comment form."""
 
         model = Comment
         fields = (
